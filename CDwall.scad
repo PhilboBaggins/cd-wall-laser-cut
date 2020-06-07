@@ -1,6 +1,7 @@
 
 // https://en.wikipedia.org/wiki/Optical_disc_packaging#Jewel_case
-CD_CASE_SIZE = [142, 125, 10];
+CD_CASE_SIZE = [142, 125, 10]
+    + [1, 1, 0]; // Plus a little more to make sure cut out is large enough
 
 DEFAULT_NUM_CD_X = 4;
 DEFAULT_NUM_CD_Y = 2;
@@ -11,35 +12,31 @@ DEFAULT_SPACING_Y = 10;
 DEFAULT_HOLDER_THICKNESS = 9;
 DEFAULT_COVER_THICKNESS = 1;
 
-DEFAULT_EXTRA_CUT_OUT = [1, 1];
-
 HOLDER_COLOUR = "orange";
 COVER_COLOUR = "grey";
 HOLDER_ALPHA = 1.0;
 COVER_ALPHA = 0.25;
 
-module JewelCase(extraCutOut)
+module JewelCase()
 {
-    extraCutOut = [extraCutOut[0], extraCutOut[1], 0];
-
     color(rands(0, 1.0, 3))
-    cube(CD_CASE_SIZE + extraCutOut);
+    cube(CD_CASE_SIZE);
 }
 
-module ArrayOfJewelCases(numCDX, numCDY, spacingX, spacingY, extraCutOut)
+module ArrayOfJewelCases(numCDX, numCDY, spacingX, spacingY)
 {
     for (x = [0 : 1 : numCDX - 1])
     for (y = [0 : 1 : numCDY - 1])
     {
-        xPos = x * (CD_CASE_SIZE[0] + spacingX + extraCutOut[0]);
-        yPos = y * (CD_CASE_SIZE[1] + spacingY + extraCutOut[1]);
+        xPos = x * (CD_CASE_SIZE[0] + spacingX);
+        yPos = y * (CD_CASE_SIZE[1] + spacingY);
 
         translate([xPos, yPos, 0])
-        JewelCase(extraCutOut);
+        JewelCase();
     }
 }
 
-module Panel(numCDX, numCDY, spacingX, spacingY, thickness, extraCutOut, colour, alpha, includeCDHoles)
+module Panel(numCDX, numCDY, spacingX, spacingY, thickness, colour, alpha, includeCDHoles)
 {
     xSize = CD_CASE_SIZE[0] * numCDX + spacingX * (numCDX + 1);
     ySize = CD_CASE_SIZE[1] * numCDY + spacingY * (numCDY + 1);
@@ -55,19 +52,19 @@ module Panel(numCDX, numCDY, spacingX, spacingY, thickness, extraCutOut, colour,
         {
             // Holes for jewel cases
             translate([spacingX, spacingY, 0])
-            ArrayOfJewelCases(numCDX, numCDY, spacingX, spacingY, extraCutOut);
+            ArrayOfJewelCases(numCDX, numCDY, spacingX, spacingY);
         }
     }
 }
 
-module Holder(numCDX, numCDY, spacingX, spacingY, thickness, extraCutOut)
+module Holder(numCDX, numCDY, spacingX, spacingY, thickness)
 {
-    Panel(numCDX, numCDY, spacingX, spacingY, thickness, extraCutOut, HOLDER_COLOUR, HOLDER_ALPHA, true);
+    Panel(numCDX, numCDY, spacingX, spacingY, thickness, HOLDER_COLOUR, HOLDER_ALPHA, true);
 }
 
 module Cover(numCDX, numCDY, spacingX, spacingY, thickness)
 {
-    Panel(numCDX, numCDY, spacingX, spacingY, thickness, [0, 0], COVER_COLOUR, COVER_ALPHA, false);
+    Panel(numCDX, numCDY, spacingX, spacingY, thickness, COVER_COLOUR, COVER_ALPHA, false);
 }
 
 module CDwall(
@@ -76,31 +73,29 @@ module CDwall(
     spacingX = DEFAULT_SPACING_X,
     spacingY = DEFAULT_SPACING_Y,
     holderThickness = DEFAULT_HOLDER_THICKNESS,
-    coverThickness = DEFAULT_COVER_THICKNESS,
-    extraCutOut = DEFAULT_EXTRA_CUT_OUT)
+    coverThickness = DEFAULT_COVER_THICKNESS)
 {
     Cover(numCDX, numCDY, spacingX, spacingY, coverThickness);
 
     translate([0, 0, coverThickness])
-    Holder(numCDX, numCDY, spacingX, spacingY, holderThickness, extraCutOut);
+    Holder(numCDX, numCDY, spacingX, spacingY, holderThickness);
 
     translate([0, 0, coverThickness + holderThickness])
     Cover(numCDX, numCDY, spacingX, spacingY, coverThickness);
 
     // Jewel cases
     translate([spacingX, spacingY, coverThickness])
-    ArrayOfJewelCases(numCDX, numCDY, spacingX, spacingY, extraCutOut);
+    ArrayOfJewelCases(numCDX, numCDY, spacingX, spacingY);
 }
 
 module Holder2D(
     numCDX = DEFAULT_NUM_CD_X,
     numCDY = DEFAULT_NUM_CD_Y,
     spacingX = DEFAULT_SPACING_X,
-    spacingY = DEFAULT_SPACING_Y,
-    extraCutOut = DEFAULT_EXTRA_CUT_OUT)
+    spacingY = DEFAULT_SPACING_Y)
 {
     projection()
-    Panel(numCDX, numCDY, spacingX, spacingY, DEFAULT_HOLDER_THICKNESS, extraCutOut, HOLDER_COLOUR, HOLDER_ALPHA, true);
+    Panel(numCDX, numCDY, spacingX, spacingY, DEFAULT_HOLDER_THICKNESS, HOLDER_COLOUR, HOLDER_ALPHA, true);
 }
 
 module Cover2D(
@@ -110,7 +105,7 @@ module Cover2D(
     spacingY = DEFAULT_SPACING_Y)
 {
     projection()
-    Panel(numCDX, numCDY, spacingX, spacingY, DEFAULT_COVER_THICKNESS, [0, 0], COVER_COLOUR, COVER_ALPHA, false);
+    Panel(numCDX, numCDY, spacingX, spacingY, DEFAULT_COVER_THICKNESS, COVER_COLOUR, COVER_ALPHA, false);
 }
 
 //CDwall();
