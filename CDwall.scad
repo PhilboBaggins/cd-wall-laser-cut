@@ -113,7 +113,6 @@ module Cover2D(
     Panel(numCDX, numCDY, spacingX, spacingY, DEFAULT_COVER_THICKNESS, [0, 0], COVER_COLOUR, COVER_ALPHA, false);
 }
 
-
 //CDwall();
 
 //Holder2D();
