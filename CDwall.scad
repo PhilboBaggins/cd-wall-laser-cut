@@ -82,10 +82,6 @@ module CDwall(
 
     translate([0, 0, coverThickness + holderThickness])
     Cover(numCDX, numCDY, spacingX, spacingY, coverThickness);
-
-    // Jewel cases
-    translate([spacingX, spacingY, coverThickness])
-    ArrayOfJewelCases(numCDX, numCDY, spacingX, spacingY);
 }
 
 module Holder2D(
